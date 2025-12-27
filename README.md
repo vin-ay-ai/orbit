@@ -4,14 +4,24 @@ Unified ATT&CK and D3FEND knowledge graph ingestion pipeline for building struct
 
 ## Overview
 
-Orbit is a clean, testable ingestion pipeline designed to transform STIX-formatted threat intelligence (ATT&CK, D3FEND) into a Neo4j knowledge graph. The project emphasizes schema clarity, reproducible runs, and maintainable architecture.
+Orbit is a **deterministic, extensible ingestion pipeline** that serves as the single, trustworthy entrypoint for threat intelligence data. The project establishes clean architectural boundaries between source adapters, validation, and persistence-ready outputs.
 
-## Status
+## Current Phase: Foundation Phase
 
-**Early development** - Structure-first rebuild phase.
+**Status**: In Development
+
+**Phase Goal**: Establish deterministic ingestion architecture with clear schema boundaries, reproducible runs, and extensibility for multiple threat intelligence sources.
+
+### Phase Objectives
+
+1. **Single Ingestion Entrypoint**: Clear, documented interface for all data ingestion
+2. **Schema & Validation**: Explicit data models with validation at ingestion time
+3. **Deterministic Execution**: Reproducible runs with identical inputs → identical outputs
+4. **Testability**: Comprehensive test coverage with offline execution
+5. **Extensibility**: Pluggable adapters for ATT&CK, D3FEND, and future sources
 
 Currently implemented:
-- STIX bundle loader
+- STIX bundle loader foundation
 - ATT&CK structural analysis framework
 - Conceptual workflow documentation
 
@@ -26,13 +36,35 @@ Currently implemented:
 
 ```
 orbit/
-├── src/orbit/           # Core package
+├── src/orbit/                   # Core package
 │   ├── __init__.py
-│   └── loaders.py       # STIX bundle loading functionality
-├── data/                # STIX data files
+│   ├── loaders.py               # STIX bundle loading (legacy)
+│   ├── ingestion/               # Core ingestion orchestration
+│   │   ├── __init__.py
+│   │   └── pipeline.py          # Single ingestion entrypoint
+│   ├── adapters/                # Source-specific adapters
+│   │   ├── __init__.py
+│   │   ├── base.py              # Adapter interface
+│   │   ├── attack.py            # ATT&CK adapter
+│   │   └── d3fend.py            # D3FEND adapter
+│   └── schemas/                 # Data models and validation
+│       ├── __init__.py
+│       ├── base.py              # Base schema definitions
+│       └── stix.py              # STIX-specific schemas
+├── tests/                       # Test suite
+│   ├── __init__.py
+│   ├── fixtures/                # Deterministic test data
+│   ├── test_ingestion.py
+│   ├── test_adapters.py
+│   └── test_schemas.py
+├── data/                        # Source data files
 │   └── enterprise-attack.json
-├── ATT&CK STIX Analysis Workflow (Conceptual).ipynb  # Analysis guide
-├── requirements.txt     # Python dependencies
+├── playground/                  # Experimentation workspace
+├── docs/                        # Documentation
+│   ├── ARCHITECTURE.md          # System architecture
+│   └── CONTRIBUTING.md          # Developer guide
+├── ATT&CK STIX Analysis Workflow (Conceptual).ipynb
+├── requirements.txt
 └── README.md
 ```
 
@@ -83,14 +115,15 @@ See `ATT&CK STIX Analysis Workflow (Conceptual).ipynb` for a comprehensive guide
 - Handling lifecycle states (revoked, deprecated)
 - Mapping STIX IDs to ATT&CK IDs
 
-## Goals
+## Architectural Principles
 
-Build a clean, testable ingestion pipeline with:
-- **Clear schema boundaries**: Well-defined data models and validation
-- **Reproducible runs**: Deterministic pipeline execution
-- **Single entrypoint**: Unified interface for ingestion operations
-- **Testability**: Comprehensive test coverage
-- **Extensibility**: Support for multiple threat intelligence sources (ATT&CK, D3FEND)
+Orbit follows these core principles to ensure reliability and maintainability:
+
+1. **Schemas are contracts, not suggestions**: All data models are explicitly defined and enforced
+2. **Relationships are validated, not assumed**: Schema validation at ingestion time
+3. **Reproducibility > convenience**: Identical inputs always produce identical outputs
+4. **Adapters isolate volatility**: Source-specific logic is encapsulated in adapters
+5. **No silent coercion or lossy normalization**: Data transformation is explicit and traceable
 
 ## Development
 
@@ -100,22 +133,47 @@ Build a clean, testable ingestion pipeline with:
 pytest
 ```
 
-### Project Principles
+### Project Structure Principles
 
-1. **Structure-first**: Define schema and validation before implementation
-2. **Explicit over implicit**: Clear data flow and transformations
-3. **Testable components**: Small, focused functions with clear contracts
-4. **Documentation**: Code and workflow documentation in parallel
+1. **Clear separation of concerns**:
+   - `adapters/` - Source-specific ingestion logic (ATT&CK, D3FEND)
+   - `schemas/` - Data models and validation contracts
+   - `ingestion/` - Core orchestration and entrypoint
+   - `tests/` - Deterministic, offline-executable test suite
 
-## Roadmap
+2. **Deterministic execution**: Tests use pinned fixtures, no live external data
 
-- [ ] Complete STIX object type taxonomy
-- [ ] Implement relationship extraction and validation
-- [ ] Neo4j ingestion pipeline
-- [ ] D3FEND integration
-- [ ] Schema versioning and migration
-- [ ] CLI interface
-- [ ] Comprehensive test suite
+3. **Extensibility**: New sources added via adapter interface without core logic changes
+
+## Foundation Phase Roadmap
+
+### Phase Deliverables
+
+- [ ] **Ingestion Module**: Single public entrypoint with documented interface
+- [ ] **Schema Definitions**: Explicit data models for all ingested entities
+- [ ] **Adapter Interface**: Pluggable adapter system for ATT&CK and D3FEND
+- [ ] **Validation Layer**: Schema validation with clear failure modes
+- [ ] **Test Suite**: Deterministic, offline-executable tests for all components
+- [ ] **Developer Documentation**: Guide for adding new sources and running ingestion
+
+### Success Criteria (Phase Exit Conditions)
+
+The Foundation Phase is complete when:
+
+- ✅ Fresh clone can ingest supported sources with one command
+- ✅ Same inputs produce byte-identical outputs
+- ✅ Invalid data fails loudly and predictably
+- ✅ Adding new source doesn't require modifying core ingestion logic
+- ✅ Tests run offline and pass deterministically
+
+### Explicit Non-Goals (Out of Scope)
+
+- Graph construction or reasoning logic
+- Query interfaces or APIs
+- Visualization or analytics
+- Performance optimization beyond correctness
+- Automated enrichment or inference
+- Cross-source semantic reconciliation
 
 ## Contributing
 
