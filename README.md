@@ -4,7 +4,7 @@ Unified ATT&CK and D3FEND knowledge graph ingestion pipeline for building struct
 
 ## Overview
 
-Orbit is a **deterministic, extensible ingestion pipeline** that serves as the single, trustworthy entrypoint for threat intelligence data. The project establishes clean architectural boundaries between source adapters, validation, and persistence-ready outputs.
+ORBIT.CyberOntology is an open-source project from ORBIT-AI.ORG that builds a cybersecurity knowledge graph connecting MITRE ATT&CK, MITRE D3FEND, and NIST Cybersecurity Framework (CSF 2.0), by leveraging existing ontologies and eriching them to create a unified, machine-readable model of cyber threats, defenses, and controls — a foundation for operational risk and resilience intelligence.
 
 ## Current Phase: Foundation Phase
 
