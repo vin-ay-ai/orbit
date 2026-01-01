@@ -5,3 +5,4 @@ __pycache__/
 .ipynb_checkpoints/
 .DS_Store
 orbit.code-workspace
+docs/orbit_execsummary.md
